@@ -1,18 +1,18 @@
 class NoteManager {
   constructor() {
-    this.STORAGE_KEY = 'blocoDeNotas_content';
-    this.HISTORY_KEY = 'blocoDeNotas_history';
-    this.THEME_KEY = 'blocoDeNotas_theme';
-    this.textarea = document.getElementById('blocoDeNotas');
-    this.charCount = document.getElementById('charCount');
-    this.saveBtn = document.getElementById('saveBtn');
-    this.clearBtn = document.getElementById('clearBtn');
-    this.exportBtn = document.getElementById('exportBtn');
-    this.themeBtn = document.getElementById('themeBtn');
-    this.clearHistoryBtn = document.getElementById('clearHistoryBtn');
-    this.historyBody = document.getElementById('historyBody');
-    this.notification = document.getElementById('notification');
-    
+    this.STORAGE_KEY = "blocoDeNotas_content";
+    this.HISTORY_KEY = "blocoDeNotas_history";
+    this.THEME_KEY = "blocoDeNotas_theme";
+    this.textarea = document.getElementById("blocoDeNotas");
+    this.charCount = document.getElementById("charCount");
+    this.saveBtn = document.getElementById("saveBtn");
+    this.clearBtn = document.getElementById("clearBtn");
+    this.exportBtn = document.getElementById("exportBtn");
+    this.themeBtn = document.getElementById("themeBtn");
+    this.clearHistoryBtn = document.getElementById("clearHistoryBtn");
+    this.historyBody = document.getElementById("historyBody");
+    this.notification = document.getElementById("notification");
+
     this.init();
   }
 
@@ -31,30 +31,30 @@ class NoteManager {
         this.updateCharCount();
       }
     } catch (error) {
-      console.error('Erro ao carregar nota:', error);
-      this.showNotification('Erro ao carregar nota', 'error');
+      console.error("Erro ao carregar nota:", error);
+      this.showNotification("Erro ao carregar nota", "error");
     }
   }
 
   saveNote() {
     try {
       const currentValue = this.textarea.value;
-      
+
       if (currentValue.length === 0) {
-        this.showNotification('Nenhum conteúdo para salvar', 'info');
+        this.showNotification("Nenhum conteúdo para salvar", "info");
         return;
       }
-      
+
       // Salva no localStorage (conteúdo atual)
       localStorage.setItem(this.STORAGE_KEY, currentValue);
-      
+
       // Adiciona ao histórico
       this.addToHistory(currentValue);
-      
-      this.showNotification('Nota salva com sucesso!', 'success');
+
+      this.showNotification("Nota salva com sucesso!", "success");
     } catch (error) {
-      console.error('Erro ao salvar nota:', error);
-      this.showNotification('Erro ao salvar nota', 'error');
+      console.error("Erro ao salvar nota:", error);
+      this.showNotification("Erro ao salvar nota", "error");
     }
   }
 
@@ -62,25 +62,25 @@ class NoteManager {
     try {
       const history = this.getHistory();
       const timestamp = new Date();
-      
+
       const entry = {
-        date: timestamp.toLocaleDateString('pt-BR'),
-        time: timestamp.toLocaleTimeString('pt-BR'),
+        date: timestamp.toLocaleDateString("pt-BR"),
+        time: timestamp.toLocaleTimeString("pt-BR"),
         content: content,
-        id: Date.now()
+        id: Date.now(),
       };
-      
+
       history.unshift(entry);
-      
+
       // Manter apenas as últimas 50 entradas
       if (history.length > 50) {
         history.pop();
       }
-      
+
       localStorage.setItem(this.HISTORY_KEY, JSON.stringify(history));
       this.loadHistory();
     } catch (error) {
-      console.error('Erro ao adicionar ao histórico:', error);
+      console.error("Erro ao adicionar ao histórico:", error);
     }
   }
 
@@ -89,24 +89,26 @@ class NoteManager {
       const saved = localStorage.getItem(this.HISTORY_KEY);
       return saved ? JSON.parse(saved) : [];
     } catch (error) {
-      console.error('Erro ao carregar histórico:', error);
+      console.error("Erro ao carregar histórico:", error);
       return [];
     }
   }
 
   loadHistory() {
     const history = this.getHistory();
-    
+
     if (history.length === 0) {
-      this.historyBody.innerHTML = '<tr><td colspan="3" class="empty-message">Nenhuma nota no histórico</td></tr>';
+      this.historyBody.innerHTML =
+        '<tr><td colspan="3" class="empty-message">Nenhuma nota no histórico</td></tr>';
       return;
     }
-    
-    this.historyBody.innerHTML = history.map(entry => {
-      const preview = entry.content.substring(0, 60).replace(/\n/g, ' ');
-      const displayPreview = preview.length >= 60 ? preview + '...' : preview;
-      
-      return `
+
+    this.historyBody.innerHTML = history
+      .map((entry) => {
+        const preview = entry.content.substring(0, 60).replace(/\n/g, " ");
+        const displayPreview = preview.length >= 60 ? preview + "..." : preview;
+
+        return `
         <tr>
           <td>${entry.date} ${entry.time}</td>
           <td class="history-preview" title="${entry.content}">${displayPreview}</td>
@@ -116,116 +118,126 @@ class NoteManager {
           </td>
         </tr>
       `;
-    }).join('');
+      })
+      .join("");
   }
 
   restoreFromHistory(id) {
     const history = this.getHistory();
-    const entry = history.find(e => e.id === id);
-    
+    const entry = history.find((e) => e.id === id);
+
     if (entry) {
       this.textarea.value = entry.content;
       this.updateCharCount();
-      this.showNotification('Nota restaurada. Clique em Salvar para confirmar!', 'info');
+      this.showNotification(
+        "Nota restaurada. Clique em Salvar para confirmar!",
+        "info",
+      );
     }
   }
 
   deleteFromHistory(id) {
-    if (confirm('Deseja deletar esta entrada do histórico?')) {
+    if (confirm("Deseja deletar esta entrada do histórico?")) {
       let history = this.getHistory();
-      history = history.filter(e => e.id !== id);
+      history = history.filter((e) => e.id !== id);
       localStorage.setItem(this.HISTORY_KEY, JSON.stringify(history));
       this.loadHistory();
-      this.showNotification('Entrada deletada', 'success');
+      this.showNotification("Entrada deletada", "success");
     }
   }
 
   clearHistory() {
-    if (confirm('Tem certeza que deseja limpar todo o histórico?')) {
+    if (confirm("Tem certeza que deseja limpar todo o histórico?")) {
       localStorage.setItem(this.HISTORY_KEY, JSON.stringify([]));
       this.loadHistory();
-      this.showNotification('Histórico limpo', 'success');
+      this.showNotification("Histórico limpo", "success");
     }
   }
 
   updateCharCount() {
     const length = this.textarea.value.length;
-    const wordCount = this.textarea.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+    const wordCount = this.textarea.value
+      .trim()
+      .split(/\s+/)
+      .filter((w) => w.length > 0).length;
     this.charCount.textContent = `${length} caracteres • ${wordCount} palavras`;
   }
 
   clearNote() {
     if (this.textarea.value.length === 0) {
-      this.showNotification('Nada para limpar', 'info');
+      this.showNotification("Nada para limpar", "info");
       return;
     }
 
-    if (confirm('Tem certeza que deseja limpar todas as notas?')) {
-      this.textarea.value = '';
+    if (confirm("Tem certeza que deseja limpar todas as notas?")) {
+      this.textarea.value = "";
       this.updateCharCount();
-      localStorage.setItem(this.STORAGE_KEY, '');
-      this.showNotification('Notas limpas com sucesso', 'success');
+      localStorage.setItem(this.STORAGE_KEY, "");
+      this.showNotification("Notas limpas com sucesso", "success");
     }
   }
 
   exportNote() {
     const content = this.textarea.value;
     if (content.length === 0) {
-      this.showNotification('Nenhuma nota para exportar', 'info');
+      this.showNotification("Nenhuma nota para exportar", "info");
       return;
     }
 
-    const element = document.createElement('a');
-    const file = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const date = new Date().toISOString().split('T')[0];
-    
+    const element = document.createElement("a");
+    const file = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const date = new Date().toISOString().split("T")[0];
+
     element.href = URL.createObjectURL(file);
     element.download = `notas_${date}.txt`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
-    
-    this.showNotification('Nota exportada com sucesso', 'success');
+
+    this.showNotification("Nota exportada com sucesso", "success");
   }
 
   toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    document.documentElement.setAttribute('data-theme', newTheme);
+    const currentTheme = document.documentElement.getAttribute("data-theme");
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+    document.documentElement.setAttribute("data-theme", newTheme);
     localStorage.setItem(this.THEME_KEY, newTheme);
-    this.showNotification(`Tema ${newTheme === 'dark' ? 'escuro' : 'claro'} ativado`, 'success');
+    this.showNotification(
+      `Tema ${newTheme === "dark" ? "escuro" : "claro"} ativado`,
+      "success",
+    );
   }
 
   applyTheme() {
-    const savedTheme = localStorage.getItem(this.THEME_KEY) || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
+    const savedTheme = localStorage.getItem(this.THEME_KEY) || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
   }
 
-  showNotification(message, type = 'info') {
+  showNotification(message, type = "info") {
     this.notification.textContent = message;
     this.notification.className = `notification notification-${type}`;
-    this.notification.style.display = 'block';
-    
+    this.notification.style.display = "block";
+
     setTimeout(() => {
-      this.notification.style.display = 'none';
+      this.notification.style.display = "none";
     }, 3000);
   }
 
   attachEventListeners() {
-    this.textarea.addEventListener('input', () => {
+    this.textarea.addEventListener("input", () => {
       this.updateCharCount();
     });
 
-    this.saveBtn.addEventListener('click', () => this.saveNote());
-    this.clearBtn.addEventListener('click', () => this.clearNote());
-    this.exportBtn.addEventListener('click', () => this.exportNote());
-    this.themeBtn.addEventListener('click', () => this.toggleTheme());
-    this.clearHistoryBtn.addEventListener('click', () => this.clearHistory());
+    this.saveBtn.addEventListener("click", () => this.saveNote());
+    this.clearBtn.addEventListener("click", () => this.clearNote());
+    this.exportBtn.addEventListener("click", () => this.exportNote());
+    this.themeBtn.addEventListener("click", () => this.toggleTheme());
+    this.clearHistoryBtn.addEventListener("click", () => this.clearHistory());
 
-    const exitBtn = document.getElementById('exitBtn');
+    const exitBtn = document.getElementById("exitBtn");
     if (exitBtn) {
-      exitBtn.addEventListener('click', () => {
+      exitBtn.addEventListener("click", () => {
         window.close();
       });
     }
@@ -234,6 +246,6 @@ class NoteManager {
 
 let noteManager;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   noteManager = new NoteManager();
 });
