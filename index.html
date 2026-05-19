@@ -3,20 +3,75 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Bloco de notas com salvamento automático em localStorage" />
     <title>Bloco de Notas Moderno</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="container">
-      <h1>Meu Bloco de Notas</h1>
-      <h2>Escreve alguma piada boa ai</h2>
-      <p>Suas anotações são salvas automaticamente no seu navegador.</p>
+    <main class="container">
+      <header>
+        <h1>Bloco de Notas</h1>
+        <p class="subtitle">Suas anotações são salvas automaticamente no navegador</p>
+      </header>
 
-      <textarea
-        id="blocoDeNotas"
-        placeholder="Comece a digitar aqui..."
-      ></textarea>
-    </div>
+      <div class="editor-section">
+        <textarea
+          id="blocoDeNotas"
+          class="textarea"
+          placeholder="Comece a digitar aqui..."
+          aria-label="Área de texto para anotações"
+          aria-describedby="charCount"
+        ></textarea>
+        
+        <div class="editor-info">
+          <span id="charCount" class="char-count">0 caracteres</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="saveBtn" class="btn btn-success" aria-label="Salvar nota">
+          💾 Salvar
+        </button>
+        <button id="clearBtn" class="btn btn-danger" aria-label="Limpar todas as notas">
+          🗑️ Limpar
+        </button>
+        <button id="exportBtn" class="btn btn-primary" aria-label="Exportar notas como arquivo">
+          📥 Exportar
+        </button>
+        <button id="themeBtn" class="btn btn-secondary" aria-label="Alternar tema escuro/claro">
+          🌙 Tema
+        </button>
+      </div>
+
+      <div class="history-section">
+        <div class="history-header">
+          <h2>📋 Histórico de Notas</h2>
+          <button id="clearHistoryBtn" class="btn btn-small" aria-label="Limpar histórico">
+            Limpar Histórico
+          </button>
+        </div>
+        <div class="table-wrapper">
+          <table id="historyTable" class="history-table">
+            <thead>
+              <tr>
+                <th>Data/Hora</th>
+                <th>Preview</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody">
+              <tr>
+                <td colspan="3" class="empty-message">Nenhuma nota no histórico</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+    </main>
+
+    <button id="exitBtn" class="exit-btn" aria-label="Sair" title="Sair"></button>
 
     <script src="script.js"></script>
   </body>
